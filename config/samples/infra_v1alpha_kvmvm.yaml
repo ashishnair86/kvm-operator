@@ -1,0 +1,9 @@
+apiVersion: infra.example.com/v1alpha
+kind: KVMVM
+metadata:
+  labels:
+    app.kubernetes.io/name: kvm-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: kvmvm-sample
+spec:
+  # TODO(user): Add fields here

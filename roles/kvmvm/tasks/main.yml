@@ -1,0 +1,61 @@
+---
+- name: Check if VM exists
+  shell: |
+      virsh dominfo {{ vm_name }}
+  register: vm_check
+  failed_when: false
+  changed_when: false
+- name: Create VM if missing
+  community.libvirt.virt:
+      command: define
+      xml: |
+          <domain type='kvm'>
+            <name>{{ vm_name }}</name>
+            <memory unit='MiB'>{{ memory }}</memory>
+            <vcpu>{{ vcpus }}</vcpu>
+
+            <os>
+              <type>hvm</type>
+            </os>
+
+            <devices>
+              <disk type='file'>
+                 <source file='{{ image }}'/>
+                 <target dev='vda'/>
+              </disk>
+
+              <interface type='network'>
+                    <source network='{{ network }}'/>
+              </interface>
+            </devices>
+          </domain>
+  when: vm_check.rc !=0
+- name: Obtain current VM info
+  shell: virsh dominfo {{ vm_name }}
+  register: current_info
+  changed_when: false
+
+
+- name: Reconcile memory
+  shell: |
+      virsh setmem {{ vm_name }} {{ memory }}M --config
+  when:
+      - vm_check.rc==0
+      - memory|string not in current_info.stdout
+- name: Reconcile cpu
+  shell: |
+      virsh setvcpus {{ vm_name }} {{ vcpus }} --config
+  when:
+      - vm_check.rc==0
+#- operator_sdk.util.k8s_status:
+#    api_version: infra.example.com/v1alpha1
+#    kind: KVMVM
+#    name: "{{ ansible_operator_meta.name }}"
+#    namespace: "{{ ansible_operator_meta.namespace }}"
+#    status:
+#       phase: Ready
+#       vmState: "{{ current_info.stdout }}"
+#- name: Delete VM
+#  community.libvirt.virt:
+#      name: "{{ vm_name }}"
+#      command: destroy

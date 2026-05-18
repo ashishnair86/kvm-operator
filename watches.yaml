@@ -1,0 +1,9 @@
+---
+# Use the 'create api' subcommand to add watches to this file.
+  # FIXME: Specify the role or playbook for this resource.
+# +kubebuilder:scaffold:watch
+- version: v1alpha1
+  group: infra.example.com
+  kind: KVMVM
+  role: kvmvm
+  reconcilePeriod: 30s

@@ -1,0 +1,11 @@
+apiVersion: infra.example.com/v1alpha1
+kind: KVMVM
+metadata:
+  name: rhel-vm
+spec:
+  vm_name: rhel-test
+  memory: 4096
+  vcpus: 2
+  disksize: 20
+  image: "/var/lib/libvirt/images/rhel9.qcow2"
+  network: default
